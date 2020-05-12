@@ -16,16 +16,16 @@ public class Ship : MonoBehaviour
         initialPosition = new Vector2(transform.position.x,transform.position.y - GetComponent<SpriteRenderer>().bounds.size.y/2f);
         this.gameObject.transform.GetChild(0).position = new Vector3(transform.position.x,transform.position.y - GetComponent<SpriteRenderer>().bounds.size.y/2f);
     }
-    public void DrawTrajectory(GameObject[] bodies, float timeStep)
+    public void UpdateTrajectory(GameObject[] bodies, float timeStep)
     {
-        int count = 5000;
+        int count = 2500;
         LineRenderer line = GetComponent<LineRenderer>();
         line.enabled = true;
         line.positionCount = count;
 
         Vector2 pos = initialPosition;
         Vector2 vel = initialVelocity;
-        for (var i = 0; i < count; i++)
+        for (int i = 0; i < count; i++)
         {
             line.SetPosition(i, pos);
             foreach (GameObject b in bodies)

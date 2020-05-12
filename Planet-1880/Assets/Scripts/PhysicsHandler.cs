@@ -14,7 +14,7 @@ public class PhysicsHandler : MonoBehaviour
         {
             for (int i = 0; i < ships.Count; i++)
             {
-                ships[i].DrawTrajectory(bodies, timeStep);
+                ships[i].UpdateTrajectory(bodies, timeStep);
             }
         }
         if (Input.GetKeyDown(KeyCode.Space))
