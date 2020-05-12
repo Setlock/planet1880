@@ -1,74 +1,96 @@
-﻿using System;
+﻿using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UIElements;
 
 public class Ship : MonoBehaviour
 {
+    public Player owner;
     Rigidbody2D rb;
-    public float launchSpeed = 3;
-
-    Vector2 initialPosition;
-    Vector2 initialVelocity;
+    float moveSpeed = 20;
+    Vector2 pivotPoint;
     Vector2 currentVelocity = Vector2.zero;
+    bool movingToLocation = false;
 
-    void Start()
+    private void Start()
     {
+        this.transform.GetChild(0).position = new Vector2(transform.position.x, transform.position.y - GetComponent<SpriteRenderer>().bounds.size.y / 2f);
         rb = GetComponent<Rigidbody2D>();
-        initialPosition = new Vector2(transform.position.x,transform.position.y - GetComponent<SpriteRenderer>().bounds.size.y/2f);
-        this.gameObject.transform.GetChild(0).position = new Vector3(transform.position.x,transform.position.y - GetComponent<SpriteRenderer>().bounds.size.y/2f);
     }
-    public void UpdateTrajectory(GameObject[] bodies, float timeStep)
+    private void FixedUpdate()
     {
-        int count = 2500;
-        LineRenderer line = GetComponent<LineRenderer>();
-        line.enabled = true;
-        line.positionCount = count;
-
-        Vector2 pos = initialPosition;
-        Vector2 vel = initialVelocity;
-        for (int i = 0; i < count; i++)
+        if(bodyToMoveTo != null)
         {
-            line.SetPosition(i, pos);
-            foreach (GameObject b in bodies)
+            MoveToBody(bodyToMoveTo);
+            rb.position += currentVelocity * Time.deltaTime;
+        }
+        else
+        {
+            Orbit();
+        }
+    }
+    float orbitSpeed = 10;
+    public float orbitAngle = 0, orbitDist = 20;
+    public GameObject bodyToOrbit;
+    public void Orbit()
+    {
+        if (!movingToLocation)
+        {
+            transform.position = new Vector2(bodyToOrbit.transform.position.x + Mathf.Cos(orbitAngle * Mathf.Deg2Rad) * orbitDist, bodyToOrbit.transform.position.y + Mathf.Sin(orbitAngle * Mathf.Deg2Rad) * orbitDist);
+            orbitAngle += orbitSpeed * Time.deltaTime;
+            if (orbitAngle >= 360)
             {
-                float sqrDst = (b.GetComponent<Rigidbody2D>().position - pos).sqrMagnitude;
-                Vector2 forceDir = (b.GetComponent<Rigidbody2D>().position - pos).normalized;
-                Vector2 force = forceDir * b.GetComponent<CelestialBody>().mass / sqrDst;
-                Vector2 acceleration = force;
-
-                vel += acceleration * timeStep;
+                orbitAngle = 0;
             }
-            pos += vel * timeStep;
-        }
-    }
-    public void UpdateVelocity(GameObject[] bodies, float timeStep)
-    {
-        foreach(GameObject b in bodies)
-        {
-            float sqrDst = (b.GetComponent<Rigidbody2D>().position - rb.position).sqrMagnitude;
-            Vector2 forceDir = (b.GetComponent<Rigidbody2D>().position - rb.position).normalized;
-            Vector2 force = forceDir * b.GetComponent<CelestialBody>().mass / sqrDst;
-            Vector2 acceleration = force;
 
-            currentVelocity += acceleration * timeStep;
+            transform.rotation = Quaternion.AngleAxis(orbitAngle, Vector3.forward);
         }
     }
-    public void UpdatePosition(float timeStep)
+    GameObject bodyToMoveTo;
+    public void SetLocationToMove(GameObject body)
     {
-        rb.position += currentVelocity * timeStep;
+        bodyToMoveTo = body;
+    }
+    public void SetBodyToOrbit(GameObject body)
+    {
+        this.bodyToOrbit = body;
+    }
+    public void MoveToBody(GameObject location)
+    {
+        movingToLocation = true;
+
+        float xVel = location.transform.position.x - transform.position.x;
+        float yVel = location.transform.position.y - transform.position.y;
+        Vector2 vel = new Vector2(xVel, yVel).normalized;
+        currentVelocity = vel * moveSpeed;
 
         float angle = Mathf.Atan2(currentVelocity.y, currentVelocity.x) * Mathf.Rad2Deg - 90;
         transform.rotation = Quaternion.AngleAxis(angle, Vector3.forward);
-    }
-    public void AngleShip()
-    {
-        Vector2 moveDirection = new Vector2(Input.GetAxis("Horizontal"), Input.GetAxis("Vertical"));
-        Vector3 pivot = this.gameObject.transform.GetChild(0).position;
-        transform.RotateAround(pivot, Vector3.back, moveDirection.x);
 
-        initialVelocity = new Vector2(Mathf.Cos(Mathf.Deg2Rad * (transform.eulerAngles.z + 90)) * launchSpeed, Mathf.Sin(Mathf.Deg2Rad * (transform.eulerAngles.z + 90)) * launchSpeed);
+        Vector3 dist = location.transform.position - transform.position;
+        dist.z = 0;
+        float sqrDist = (dist).sqrMagnitude;
+        if (sqrDist < (orbitDist*orbitDist))
+        {
+            location.GetComponent<Body>().AddShip(gameObject);
+            bodyToOrbit.GetComponent<Body>().RemoveShip(gameObject);
+            SetBodyToOrbit(location);
+            bodyToMoveTo = null;
+            movingToLocation = false;
+
+            orbitAngle = Mathf.Atan2((transform.position.y - location.transform.position.y), (transform.position.x - location.transform.position.x)) * Mathf.Rad2Deg;
+        }
     }
-    public void LaunchShip()
+    public void MoveToLocation(Vector2 pos)
     {
-        currentVelocity = initialVelocity;
+        movingToLocation = true;
+
+        float xVel = pos.x - transform.position.x;
+        float yVel = pos.y - transform.position.y;
+        Vector2 vel = new Vector2(xVel, yVel).normalized;
+        currentVelocity = vel*moveSpeed;
+
+        float angle = Mathf.Atan2(currentVelocity.y, currentVelocity.x) * Mathf.Rad2Deg - 90;
+        transform.rotation = Quaternion.AngleAxis(angle, Vector3.forward);
     }
 }
