@@ -6,7 +6,7 @@ public class PlayerController
 {
     public GameHandler gameHandler;
     Player myPlayer;
-    bool clickedOnce = false;
+    bool clickedOnce = false, fPressedOnce = false;
     GameObject body1, body2;
     public PlayerController(GameHandler gh, Player p)
     {
@@ -21,6 +21,37 @@ public class PlayerController
             if (body != null && body.GetComponent<Body>().GetOwner() == myPlayer)
             {
                 gameHandler.universe.SpawnShip(body);
+            }
+        }
+        if (Input.GetKeyDown(KeyCode.F))
+        {
+            if (!fPressedOnce)
+            {
+                GameObject body = Camera.main.GetComponent<CameraMove>().bodyToFollow;
+                GameObject construct = gameHandler.turretObject;
+                if (body != null && body.GetComponent<Body>().GetOwner() == myPlayer)
+                {
+                    body.GetComponent<Body>().StartConstructPlacement(construct);
+                    fPressedOnce = true;
+                }
+            }
+            else
+            {
+                GameObject body = Camera.main.GetComponent<CameraMove>().bodyToFollow;
+                if (body != null && body.GetComponent<Body>().GetOwner() == myPlayer)
+                {
+                    body.GetComponent<Body>().PlaceConstruct();
+                    fPressedOnce = false;
+                }
+            }
+        }
+        if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            GameObject body = Camera.main.GetComponent<CameraMove>().bodyToFollow;
+            if (body != null && body.GetComponent<Body>().GetOwner() == myPlayer)
+            {
+                body.GetComponent<Body>().DestroyTempConstruct();
+                fPressedOnce = false;
             }
         }
         if (Input.GetMouseButtonDown(1))

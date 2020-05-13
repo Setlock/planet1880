@@ -7,10 +7,14 @@ public class Ship : MonoBehaviour
 {
     public Player owner;
     Rigidbody2D rb;
-    float moveSpeed = 20;
+    float moveSpeed = 40;
     Vector2 pivotPoint;
     Vector2 currentVelocity = Vector2.zero;
     bool movingToLocation = false;
+    float orbitSpeed = 10;
+    public float orbitAngle = 0, orbitDist = 20;
+    GameObject bodyToOrbit;
+    GameObject bodyToMoveTo;
 
     private void Start()
     {
@@ -29,12 +33,9 @@ public class Ship : MonoBehaviour
             Orbit();
         }
     }
-    float orbitSpeed = 10;
-    public float orbitAngle = 0, orbitDist = 20;
-    public GameObject bodyToOrbit;
     public void Orbit()
     {
-        if (!movingToLocation)
+        if (!movingToLocation && bodyToOrbit != null)
         {
             transform.position = new Vector2(bodyToOrbit.transform.position.x + Mathf.Cos(orbitAngle * Mathf.Deg2Rad) * orbitDist, bodyToOrbit.transform.position.y + Mathf.Sin(orbitAngle * Mathf.Deg2Rad) * orbitDist);
             orbitAngle += orbitSpeed * Time.deltaTime;
@@ -46,9 +47,9 @@ public class Ship : MonoBehaviour
             transform.rotation = Quaternion.AngleAxis(orbitAngle, Vector3.forward);
         }
     }
-    GameObject bodyToMoveTo;
     public void SetLocationToMove(GameObject body)
     {
+        bodyToOrbit.GetComponent<Body>().RemoveShip(gameObject);
         bodyToMoveTo = body;
     }
     public void SetBodyToOrbit(GameObject body)
@@ -73,7 +74,6 @@ public class Ship : MonoBehaviour
         if (sqrDist < (orbitDist*orbitDist))
         {
             location.GetComponent<Body>().AddShip(gameObject);
-            bodyToOrbit.GetComponent<Body>().RemoveShip(gameObject);
             SetBodyToOrbit(location);
             bodyToMoveTo = null;
             movingToLocation = false;

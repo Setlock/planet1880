@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public class UniverseHandler : MonoBehaviour
@@ -21,30 +22,60 @@ public class UniverseHandler : MonoBehaviour
     {
         for (int i = 0; i < bodies.Count; i++)
         {
-            bodies[i].GetComponent<Body>().Orbit(sun);
-            bodies[i].GetComponent<Body>().ShipOrbit();
+            Body body = bodies[i].GetComponent<Body>();
+            body.Orbit(sun);
+            body.ShipOrbit();
+            if (body.GetOwner() != null)
+            {
+                body.SetConstructLocation();
+                body.TimeSpawnShip(shipPrefab, shipContainer);
+            }
+        }
+    }
+    public float countdown = 1;
+    public void UpdateClaimAmounts()
+    {
+        foreach(GameObject body in bodies)
+        {
+            body.GetComponent<Body>().CalculateClaimSpeed();
+        }
+        countdown -= Time.deltaTime;
+        if(countdown <= 0)
+        {
+            foreach (GameObject body in bodies)
+            {
+                body.GetComponent<Body>().IncrementClaim();
+            }
+            countdown = 1;
         }
     }
     void CreateBodies(Player[] players)
     {
-        for(int i = 0; i < players.Length; i++)
+        for(int i = 0; i < players.Length+extraBodies; i++)
         {
             GameObject body = Instantiate(planetPrefab);
 
-            body.GetComponent<Body>().Claim(players[i]);
-
-            body.GetComponent<Body>().orbitDist = i*(body.GetComponent<SpriteRenderer>().bounds.size.x*10)+(sun.GetComponent<SpriteRenderer>().bounds.size.x*3);
+            body.GetComponent<Body>().orbitDist = i*(body.GetComponent<SpriteRenderer>().bounds.size.x*6)+(sun.GetComponent<SpriteRenderer>().bounds.size.x*3);
             body.GetComponent<Body>().CreateDefaultDictionaries(players);
             body.name = "Planet" + body.GetComponent<Body>().orbitDist;
             bodies.Add(body);
         }
-        for(int i = 0; i < extraBodies; i++)
+
+        int[] chosenBodies = new int[players.Length];
+        for(int i = 0; i < chosenBodies.Length; i++)
         {
-            GameObject body = Instantiate(planetPrefab);
-            body.GetComponent<Body>().orbitDist = i * (body.GetComponent<SpriteRenderer>().bounds.size.x * 10) + (sun.GetComponent<SpriteRenderer>().bounds.size.x * 3);
-            body.GetComponent<Body>().CreateDefaultDictionaries(players);
-            body.name = "Planet" + body.GetComponent<Body>().orbitDist;
-            bodies.Add(body);
+            chosenBodies[i] = -1;
+        }
+        int numBody = -1;
+        for(int i = 0; i < players.Length; i++)
+        {
+            while (chosenBodies.Contains(numBody))
+            {
+                numBody = (int)(UnityEngine.Random.value * bodies.Count);
+            }
+            chosenBodies[i] = numBody;
+
+            bodies[numBody].GetComponent<Body>().Claim(players[i]);
         }
     }
     public GameObject GetBodyAtLocation(Vector2 pos)
