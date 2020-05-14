@@ -20,7 +20,10 @@ public class PlayerController
             GameObject body = Camera.main.GetComponent<CameraMove>().bodyToFollow;
             if (body != null && body.GetComponent<Body>().GetOwner() == myPlayer)
             {
-                gameHandler.universe.SpawnShip(body);
+                for (int i = 0; i < 100; i++)
+                {
+                    gameHandler.universe.SpawnShip(body);
+                }
             }
         }
         if (Input.GetKeyDown(KeyCode.F))

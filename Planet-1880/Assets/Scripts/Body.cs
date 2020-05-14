@@ -78,14 +78,6 @@ public class Body : MonoBehaviour
             ship.GetComponent<Ship>().MoveToBody(location);
         }
     }
-    public void ShipOrbit()
-    {
-        foreach(GameObject ship in ships)
-        {
-            ship.GetComponent<Ship>().SetBodyToOrbit(gameObject);
-            ship.GetComponent<Ship>().Orbit();
-        }
-    }
     public void Orbit(GameObject body)
     {
         orbitSpeed = 1000/orbitDist;
@@ -160,12 +152,14 @@ public class Body : MonoBehaviour
     {
         ship.GetComponent<Ship>().owner = owner;
         ship.GetComponent<SpriteRenderer>().color = owner.color;
+        ship.GetComponent<Ship>().SetBodyToOrbit(gameObject);
         ship.GetComponent<Ship>().orbitDist = GetComponent<SpriteRenderer>().bounds.size.y + 2 + (10*UnityEngine.Random.value);
         ship.GetComponent<Ship>().orbitAngle = 360 * UnityEngine.Random.value;
         ships.Add(ship);
     }
     public void AddShip(GameObject ship)
     {
+        ship.GetComponent<Ship>().SetBodyToOrbit(gameObject);
         ships.Add(ship);
     }
     public void RemoveShip(GameObject ship)

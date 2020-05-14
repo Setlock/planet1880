@@ -10,9 +10,9 @@ GameObject:
   m_Component:
   - component: {fileID: 2082488736857122948}
   - component: {fileID: 2300561801554198919}
-  - component: {fileID: 2063363706906715316}
-  - component: {fileID: 4077480360927456211}
   - component: {fileID: 6178496766190580002}
+  - component: {fileID: 9100817519227140105}
+  - component: {fileID: 70834085679220881}
   m_Layer: 8
   m_Name: Ship
   m_TagString: Untagged
@@ -85,7 +85,21 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
---- !u!50 &2063363706906715316
+--- !u!114 &6178496766190580002
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3513666537586168081}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 664b4fcc6e4f3414291963789b34b188, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  orbitAngle: 0
+  orbitDist: 0
+--- !u!50 &9100817519227140105
 Rigidbody2D:
   serializedVersion: 4
   m_ObjectHideFlags: 0
@@ -106,7 +120,7 @@ Rigidbody2D:
   m_SleepingMode: 1
   m_CollisionDetection: 0
   m_Constraints: 0
---- !u!60 &4077480360927456211
+--- !u!60 &70834085679220881
 PolygonCollider2D:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -116,7 +130,7 @@ PolygonCollider2D:
   m_Enabled: 1
   m_Density: 1
   m_Material: {fileID: 0}
-  m_IsTrigger: 1
+  m_IsTrigger: 0
   m_UsedByEffector: 0
   m_UsedByComposite: 0
   m_Offset: {x: 0, y: 0}
@@ -139,21 +153,6 @@ PolygonCollider2D:
       - {x: 0.42, y: -0.05}
       - {x: 0.64, y: -0.59}
       - {x: 0.64, y: -0.64}
---- !u!114 &6178496766190580002
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3513666537586168081}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 664b4fcc6e4f3414291963789b34b188, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  orbitAngle: 0
-  orbitDist: 0
-  bodyToOrbit: {fileID: 0}
 --- !u!1 &6676843029301380830
 GameObject:
   m_ObjectHideFlags: 0

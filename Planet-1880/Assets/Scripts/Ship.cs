@@ -21,9 +21,9 @@ public class Ship : MonoBehaviour
         this.transform.GetChild(0).position = new Vector2(transform.position.x, transform.position.y - GetComponent<SpriteRenderer>().bounds.size.y / 2f);
         rb = GetComponent<Rigidbody2D>();
     }
-    private void FixedUpdate()
+    private void Update()
     {
-        if(bodyToMoveTo != null)
+        if (bodyToMoveTo != null)
         {
             MoveToBody(bodyToMoveTo);
             rb.position += currentVelocity * Time.deltaTime;

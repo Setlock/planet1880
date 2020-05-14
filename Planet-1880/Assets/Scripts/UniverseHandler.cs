@@ -24,7 +24,6 @@ public class UniverseHandler : MonoBehaviour
         {
             Body body = bodies[i].GetComponent<Body>();
             body.Orbit(sun);
-            body.ShipOrbit();
             if (body.GetOwner() != null)
             {
                 body.SetConstructLocation();
