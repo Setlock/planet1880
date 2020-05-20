@@ -11,7 +11,7 @@ public class Body : MonoBehaviour
     public Dictionary<Player, int> claimLevel = new Dictionary<Player, int>();
     public Dictionary<Player, int> claimSpeed = new Dictionary<Player, int>();
     [HideInInspector]
-    public List<GameObject> ships = new List<GameObject>();
+    public Dictionary<Player, List<GameObject>> ships = new Dictionary<Player, List<GameObject>>();
     [HideInInspector]
     public List<GameObject> constructs = new List<GameObject>();
     public float orbitDist,orbitSpeed;
@@ -59,11 +59,12 @@ public class Body : MonoBehaviour
         {
             claimLevel.Add(p, 0);
             claimSpeed.Add(p, 0);
+            ships.Add(p, new List<GameObject>());
         }
     }
     public void SetShipsToMove(Player p, GameObject location)
     {
-        foreach(GameObject ship in ships.ToList())
+        foreach(GameObject ship in ships[p].ToList())
         {
             if(ship.GetComponent<Ship>().owner == p)
             {
@@ -71,9 +72,9 @@ public class Body : MonoBehaviour
             }
         }
     }
-    public void MoveShipsToObject(GameObject location)
+    public void MoveShipsToObject(Player p, GameObject location)
     {
-        foreach(GameObject ship in ships)
+        foreach(GameObject ship in ships[p])
         {
             ship.GetComponent<Ship>().MoveToBody(location);
         }
@@ -132,13 +133,9 @@ public class Body : MonoBehaviour
             if (p != owner)
             {
                 int playerClaimSpeed = decayRate;
-                foreach (GameObject ship in ships)
-                {
-                    if (ship.GetComponent<Ship>().owner == p)
-                    {
-                        playerClaimSpeed++;
-                    }
-                }
+
+                playerClaimSpeed = ships[p].Count;
+
                 if(playerClaimSpeed != decayRate)
                 {
                     playerClaimSpeed += (-decayRate);
@@ -155,16 +152,16 @@ public class Body : MonoBehaviour
         ship.GetComponent<Ship>().SetBodyToOrbit(gameObject);
         ship.GetComponent<Ship>().orbitDist = GetComponent<SpriteRenderer>().bounds.size.y + 2 + (10*UnityEngine.Random.value);
         ship.GetComponent<Ship>().orbitAngle = 360 * UnityEngine.Random.value;
-        ships.Add(ship);
+        ships[owner].Add(ship);
     }
-    public void AddShip(GameObject ship)
+    public void AddShip(Player p, GameObject ship)
     {
         ship.GetComponent<Ship>().SetBodyToOrbit(gameObject);
-        ships.Add(ship);
+        ships[p].Add(ship);
     }
-    public void RemoveShip(GameObject ship)
+    public void RemoveShip(Player p, GameObject ship)
     {
-        ships.Remove(ship);
+        ships[p].Remove(ship);
     }
     public void Claim(Player p)
     {
