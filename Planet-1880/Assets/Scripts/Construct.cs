@@ -4,15 +4,14 @@ using UnityEngine;
 
 public class Construct : MonoBehaviour
 {
+    public Rigidbody2D rb;
     // Start is called before the first frame update
     void Start()
     {
         
     }
-
-    // Update is called once per frame
-    void Update()
+    public virtual void Action()
     {
-        
+        Debug.Log("Default Action");
     }
 }

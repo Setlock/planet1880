@@ -23,12 +23,19 @@ public class UniverseHandler : MonoBehaviour
         for (int i = 0; i < bodies.Count; i++)
         {
             Body body = bodies[i].GetComponent<Body>();
-            body.Orbit(sun);
             if (body.GetOwner() != null)
             {
-                body.SetConstructLocation();
                 body.TimeSpawnShip(shipPrefab, shipContainer);
             }
+        }
+    }
+    private void FixedUpdate()
+    {
+        foreach(GameObject b in bodies)
+        {
+            Body body = b.GetComponent<Body>();
+            body.Orbit(sun);
+            body.SetConstructLocation();
         }
     }
     public float countdown = 1;
@@ -98,7 +105,8 @@ public class UniverseHandler : MonoBehaviour
             {
                 if(b == body)
                 {
-                    body.GetComponent<Body>().SpawnShip(Instantiate(shipPrefab, shipContainer.transform));
+                    GameObject shipObject = Instantiate(shipPrefab, shipContainer.transform);
+                    body.GetComponent<Body>().SpawnShip(shipObject);
                 }
             }
         }

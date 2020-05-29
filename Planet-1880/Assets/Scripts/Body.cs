@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using Packages.Rider.Editor.PostProcessors;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEditor;
@@ -15,11 +16,13 @@ public class Body : MonoBehaviour
     [HideInInspector]
     public List<GameObject> constructs = new List<GameObject>();
     public float orbitDist,orbitSpeed;
+    public Rigidbody2D rb;
 
     float orbitAngle;
     void Start()
     {
         orbitAngle = UnityEngine.Random.value * 360;
+        rb = GetComponent<Rigidbody2D>();
     }
     public GameObject tempConstruct;
     bool placingConstruct = false;
@@ -82,7 +85,7 @@ public class Body : MonoBehaviour
     public void Orbit(GameObject body)
     {
         orbitSpeed = 1000/orbitDist;
-        transform.position = new Vector2(body.transform.position.x + Mathf.Cos(orbitAngle*Mathf.Deg2Rad)*orbitDist, body.transform.position.y + Mathf.Sin(orbitAngle* Mathf.Deg2Rad) *orbitDist);
+        rb.MovePosition(new Vector2(body.transform.position.x + Mathf.Cos(orbitAngle*Mathf.Deg2Rad)*orbitDist, body.transform.position.y + Mathf.Sin(orbitAngle* Mathf.Deg2Rad) *orbitDist));
         orbitAngle += orbitSpeed * Time.deltaTime;
         if(orbitAngle >= 360)
         {
@@ -96,7 +99,8 @@ public class Body : MonoBehaviour
         spawnCountdown -= Time.deltaTime;
         if(spawnCountdown <= 0)
         {
-            SpawnShip(Instantiate(shipPrefab, container.transform));
+            GameObject shipObject = Instantiate(shipPrefab, container.transform);
+            SpawnShip(shipObject);
             spawnCountdown = 5;
         }
     }
@@ -148,10 +152,12 @@ public class Body : MonoBehaviour
     public void SpawnShip(GameObject ship)
     {
         ship.GetComponent<Ship>().owner = owner;
+        ship.transform.position = transform.position;
         ship.GetComponent<SpriteRenderer>().color = owner.color;
         ship.GetComponent<Ship>().SetBodyToOrbit(gameObject);
         ship.GetComponent<Ship>().orbitDist = GetComponent<SpriteRenderer>().bounds.size.y + 2 + (10*UnityEngine.Random.value);
         ship.GetComponent<Ship>().orbitAngle = 360 * UnityEngine.Random.value;
+
         ships[owner].Add(ship);
     }
     public void AddShip(Player p, GameObject ship)
