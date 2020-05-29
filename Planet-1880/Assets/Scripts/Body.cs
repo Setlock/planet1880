@@ -19,6 +19,9 @@ public class Body : MonoBehaviour
     public Rigidbody2D rb;
 
     float orbitAngle;
+    public float maxClaimLevel = 500;
+    float spawnShipCountdown = 3;
+    int decayRate = -2;
     void Start()
     {
         orbitAngle = UnityEngine.Random.value * 360;
@@ -92,16 +95,14 @@ public class Body : MonoBehaviour
             orbitAngle = 0;
         }
     }
-    float spawnCountdown = 5;
-    int decayRate = -1;
     public void TimeSpawnShip(GameObject shipPrefab, GameObject container)
     {
-        spawnCountdown -= Time.deltaTime;
-        if(spawnCountdown <= 0)
+        spawnShipCountdown -= Time.deltaTime;
+        if(spawnShipCountdown <= 0)
         {
             GameObject shipObject = Instantiate(shipPrefab, container.transform);
             SpawnShip(shipObject);
-            spawnCountdown = 5;
+            spawnShipCountdown = 5;
         }
     }
     public void IncrementClaim()
@@ -115,7 +116,7 @@ public class Body : MonoBehaviour
                 {
                     claimLevel[p] = 0;
                 }
-                if (claimLevel[p] >= 500)
+                if (claimLevel[p] >= maxClaimLevel)
                 {
                     Claim(p);
                     ResetAllClaimLevels();
@@ -138,11 +139,9 @@ public class Body : MonoBehaviour
             {
                 int playerClaimSpeed = decayRate;
 
-                playerClaimSpeed = ships[p].Count;
-
-                if(playerClaimSpeed != decayRate)
+                if (ships[p].Count > 0)
                 {
-                    playerClaimSpeed += (-decayRate);
+                    playerClaimSpeed = ships[p].Count;
                 }
 
                 claimSpeed[p] = playerClaimSpeed;

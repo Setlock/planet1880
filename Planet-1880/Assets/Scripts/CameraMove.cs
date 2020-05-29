@@ -15,6 +15,7 @@ public class CameraMove : MonoBehaviour
         }
         else
         {
+            universe.gameObject.GetComponent<PlayerClaimUI>().UpdateProgressBars(bodyToFollow.GetComponent<Body>());
             transform.position = new Vector3(bodyToFollow.transform.position.x, bodyToFollow.transform.position.y, transform.position.z);
         }
 

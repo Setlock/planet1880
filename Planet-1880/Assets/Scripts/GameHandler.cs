@@ -18,6 +18,7 @@ public class GameHandler : MonoBehaviour
             players[i] = new Player("COMP" + i, new Color(UnityEngine.Random.value, UnityEngine.Random.value, UnityEngine.Random.value));
         }
         universe.Init(players);
+        GetComponent<PlayerClaimUI>().CreateProgressBars(players);
 
         pc = new PlayerController(this, players[0]);
     }
