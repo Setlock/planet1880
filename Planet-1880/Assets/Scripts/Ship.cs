@@ -53,7 +53,10 @@ public class Ship : MonoBehaviour
     {
         bodyToOrbit.GetComponent<Body>().RemoveShip(owner, gameObject);
         bodyToMoveTo = body;
-        locationOffset = rb.position-bodyToOrbit.GetComponent<Rigidbody2D>().position;
+
+        orbitPos.x = bodyToOrbit.GetComponent<Body>().rb.position.x + Mathf.Cos(orbitAngle * Mathf.Deg2Rad) * orbitDist;
+        orbitPos.y = bodyToOrbit.GetComponent<Body>().rb.position.y + Mathf.Sin(orbitAngle * Mathf.Deg2Rad) * orbitDist;
+        locationOffset = orbitPos - bodyToOrbit.GetComponent<Rigidbody2D>().position;
     }
     public void SetBodyToOrbit(GameObject body)
     {
@@ -103,5 +106,9 @@ public class Ship : MonoBehaviour
     {
         bodyToOrbit.GetComponent<Body>().ships[owner].Remove(gameObject);
         Destroy(gameObject);
+    }
+    public GameObject GetBodyToOrbit()
+    {
+        return this.bodyToOrbit;
     }
 }

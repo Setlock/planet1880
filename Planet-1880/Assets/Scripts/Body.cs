@@ -9,8 +9,8 @@ public class Body : MonoBehaviour
 {
     Player owner;
     [HideInInspector]
-    public Dictionary<Player, int> claimLevel = new Dictionary<Player, int>();
-    public Dictionary<Player, int> claimSpeed = new Dictionary<Player, int>();
+    public Dictionary<Player, float> claimLevel = new Dictionary<Player, float>();
+    public Dictionary<Player, float> claimSpeed = new Dictionary<Player, float>();
     [HideInInspector]
     public Dictionary<Player, List<GameObject>> ships = new Dictionary<Player, List<GameObject>>();
     [HideInInspector]
@@ -21,7 +21,7 @@ public class Body : MonoBehaviour
     float orbitAngle;
     public float maxClaimLevel = 500;
     float spawnShipCountdown = 3;
-    int decayRate = -2;
+    int decayRate = -4;
     void Start()
     {
         orbitAngle = UnityEngine.Random.value * 360;
@@ -29,12 +29,11 @@ public class Body : MonoBehaviour
     }
     public GameObject tempConstruct;
     bool placingConstruct = false;
-    public void SetConstructLocation()
+    public void SetConstructLocation(float x, float y)
     {
         if (placingConstruct)
         {
-            Vector2 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-            float angle = Mathf.Atan2((mousePos.y - transform.position.y), (mousePos.x - transform.position.x));
+            float angle = Mathf.Atan2((y - transform.position.y), (x - transform.position.x));
             float xPos = transform.position.x + Mathf.Cos(angle) * (GetComponent<SpriteRenderer>().bounds.size.x / 2);
             float yPos = transform.position.y + Mathf.Sin(angle) * (GetComponent<SpriteRenderer>().bounds.size.y / 2);
             Vector2 finalPos = new Vector2(xPos, yPos);
@@ -47,6 +46,7 @@ public class Body : MonoBehaviour
     {
         placingConstruct = true;
         tempConstruct = Instantiate(construct);
+        tempConstruct.GetComponent<Construct>().body = gameObject;
         tempConstruct.transform.parent = transform;
     }
     public void PlaceConstruct()
@@ -102,7 +102,17 @@ public class Body : MonoBehaviour
         {
             GameObject shipObject = Instantiate(shipPrefab, container.transform);
             SpawnShip(shipObject);
-            spawnShipCountdown = 5;
+            spawnShipCountdown = 2;
+        }
+    }
+    float addMoneyCountdown = 10;
+    public void AddMoney()
+    {
+        addMoneyCountdown -= Time.deltaTime;
+        if(addMoneyCountdown <= 0)
+        {
+            GetOwner().money += 10;
+            addMoneyCountdown = 10;
         }
     }
     public void IncrementClaim()
@@ -111,7 +121,7 @@ public class Body : MonoBehaviour
         {
             if (p != owner)
             {
-                claimLevel[p] += claimSpeed[p];
+                claimLevel[p] += claimSpeed[p] * Time.deltaTime;
                 if(claimLevel[p] < 0)
                 {
                     claimLevel[p] = 0;
@@ -137,11 +147,11 @@ public class Body : MonoBehaviour
         {
             if (p != owner)
             {
-                int playerClaimSpeed = decayRate;
+                float playerClaimSpeed = decayRate;
 
                 if (ships[p].Count > 0)
                 {
-                    playerClaimSpeed = ships[p].Count;
+                    playerClaimSpeed = ships[p].Count/2f;
                 }
 
                 claimSpeed[p] = playerClaimSpeed;
@@ -177,6 +187,31 @@ public class Body : MonoBehaviour
             ship.GetComponent<Ship>().owner = p;
             ship.GetComponent<SpriteRenderer>().color = p.color;
         }*/
+    }
+    public bool BodyWillBeClaimedByEnemy()
+    {
+        int gunCount = constructs.Count;
+        foreach(Player p in ships.Keys)
+        {
+            if(p != owner)
+            {
+                int numShips = ships[p].Count;
+                for(int i = 0; i < 10; i++)
+                {
+                    numShips -= gunCount;
+                }
+
+                if(numShips > 0)
+                {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+    public int PlayerShipAmount(Player p)
+    {
+        return ships[p].Count;
     }
     public Player GetOwner()
     {
